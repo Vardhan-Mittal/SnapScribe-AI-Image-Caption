@@ -1,16 +1,31 @@
-# React + Vite
+# ⚡ SnapScribe — React 19 Frontend Web Application
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+This directory contains the **Vite + React 19** frontend for **SnapScribe**, live on Vercel:
 
-Currently, two official plugins are available:
+- 🌟 **Primary Production URL**: [https://snapscribe-ai.vercel.app](https://snapscribe-ai.vercel.app)
+- 💎 **Pro Production URL**: [https://snapscribe-pro.vercel.app](https://snapscribe-pro.vercel.app)
+- ⚡ **Direct Vercel CDN URL**: [https://web-cyan-sigma-42.vercel.app](https://web-cyan-sigma-42.vercel.app)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+---
 
-## React Compiler
+## 🛠️ Local Development
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+```bash
+# Install dependencies
+npm install
 
-## Expanding the Oxlint configuration
+# Start local dev server
+npm run dev
+```
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+## 📦 Build for Production
+
+```bash
+# Build production bundle to dist/
+npm run build
+
+# Preview production build locally
+npm run preview
+```
+
+For full system architecture, backend AI model setup, and license documentation, please refer to the **[Root README](../README.md)**.

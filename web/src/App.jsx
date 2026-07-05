@@ -177,7 +177,7 @@ export default function App() {
             <a href="https://github.com/Vardhan-Mittal/SnapScribe-AI-Image-Caption" target="_blank" rel="noopener noreferrer" className="badge badge-pink" style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
               <GitBranch size={12} /> GitHub Repo <ExternalLink size={10} />
             </a>
-            <a href="https://web-cyan-sigma-42.vercel.app" target="_blank" rel="noopener noreferrer" className="badge badge-purple" style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+            <a href="https://snapscribe-ai.vercel.app" target="_blank" rel="noopener noreferrer" className="badge badge-purple" style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
               ⚡ Vercel Live <ExternalLink size={10} />
             </a>
             <span className="badge badge-green"><Scale size={12} style={{ marginRight: '4px', display: 'inline' }} /> MIT Licensed</span>
@@ -341,7 +341,7 @@ export default function App() {
               <GitBranch size={12} /> GitHub Repository
             </a>
             •
-            <a href="https://web-cyan-sigma-42.vercel.app" target="_blank" rel="noopener noreferrer" style={{ margin: '0 8px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+            <a href="https://snapscribe-ai.vercel.app" target="_blank" rel="noopener noreferrer" style={{ margin: '0 8px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
               ⚡ Vercel Live Deployment
             </a>
             •

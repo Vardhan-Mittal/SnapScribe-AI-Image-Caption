@@ -56,51 +56,88 @@ export default function App() {
     setLoading(true)
     setConciseCaption('')
     setDetailedCaption('')
+    setStatus({ text: '🔄 Connecting to Hugging Face AI Backend...', type: '' })
 
-    const maxRetries = 3
+    // METHOD 1: Direct REST API (Fastest & Most Reliable in Browser)
+    try {
+      const form = new FormData()
+      form.append('files', image)
+      
+      setStatus({ text: '📤 Uploading image to AI server...', type: '' })
+      const uploadRes = await fetch("https://vardhanmit6-snapscribe-ai-image-caption.hf.space/gradio_api/upload", {
+        method: "POST",
+        body: form
+      }).then(r => {
+        if (!r.ok) throw new Error("Upload HTTP error " + r.status)
+        return r.json()
+      })
+
+      const fileObj = typeof uploadRes[0] === 'string' ? { 
+        path: uploadRes[0],
+        url: "https://vardhanmit6-snapscribe-ai-image-caption.hf.space/file=" + uploadRes[0],
+        orig_name: image.name || "image.png",
+        size: image.size || 100,
+        mime_type: image.type || "image/png",
+        meta: { _type: "gradio.FileData" }
+      } : uploadRes[0]
+
+      setStatus({ text: '⚡ Running BLIP vision model inference...', type: '' })
+      const callRes = await fetch("https://vardhanmit6-snapscribe-ai-image-caption.hf.space/gradio_api/call/predict", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ data: [ fileObj, prompt, style ] })
+      }).then(r => {
+        if (!r.ok) throw new Error("Predict HTTP error " + r.status)
+        return r.json()
+      })
+
+      const streamText = await fetch("https://vardhanmit6-snapscribe-ai-image-caption.hf.space/gradio_api/call/predict/" + callRes.event_id).then(r => r.text())
+      const lines = streamText.split('\n')
+      for (let i = 0; i < lines.length; i++) {
+        if (lines[i].startsWith('event: complete') && lines[i+1] && lines[i+1].startsWith('data: ')) {
+          const dataStr = lines[i+1].substring(6)
+          const [concise, detailed, statusMsg] = JSON.parse(dataStr)
+          setConciseCaption(concise || '')
+          setDetailedCaption(detailed || '')
+          if (statusMsg && statusMsg.includes('❌')) throw new Error(statusMsg)
+          setStatus({ text: '✅ Captions generated successfully!', type: 'success' })
+          setLoading(false)
+          return
+        }
+      }
+      throw new Error("Could not parse completion stream")
+    } catch (restErr) {
+      console.warn("Direct REST attempt failed, falling back to @gradio/client:", restErr)
+    }
+
+    // METHOD 2: Fallback to @gradio/client with Auto-Retry
+    const maxRetries = 2
     let attempt = 0
-
     while (attempt < maxRetries) {
       try {
         attempt++
-        if (attempt > 1) {
-          setStatus({ text: `⏳ Hugging Face Space is warming up or busy. Retrying (Attempt ${attempt}/${maxRetries})...`, type: '' })
-          await new Promise((r) => setTimeout(r, 2500 * attempt))
-        } else {
-          setStatus({ text: '🔄 Connecting to Hugging Face Space & loading BLIP...', type: '' })
-        }
+        setStatus({ text: `⏳ Retrying via fallback connection (Attempt ${attempt}/${maxRetries})...`, type: '' })
+        if (attempt > 1) await new Promise((r) => setTimeout(r, 2000))
 
-        // Connect to the Hugging Face Space backend
-        const app = await Client.connect("vardhanmit6/SnapScribe-AI-Image-Caption")
-        
-        setStatus({ text: '⚡ Running BLIP vision model inference...', type: '' })
-        
-        // Call the predict API endpoint
+        const app = await Client.connect("https://vardhanmit6-snapscribe-ai-image-caption.hf.space")
         const result = await app.predict("/predict", {
           img: image,
           prompt: prompt,
           style: style,
         })
-
-        // Destructure outputs
         const [concise, detailed, statusMsg] = result.data
-        
         setConciseCaption(concise || '')
         setDetailedCaption(detailed || '')
-        
-        if (statusMsg && statusMsg.includes('❌')) {
-          throw new Error(statusMsg)
-        }
-        
+        if (statusMsg && statusMsg.includes('❌')) throw new Error(statusMsg)
         setStatus({ text: '✅ Captions generated successfully!', type: 'success' })
         setLoading(false)
-        return // Success! Exit retry loop
+        return
       } catch (err) {
-        console.error(`Inference Attempt ${attempt} failed:`, err)
+        console.error(`Fallback Attempt ${attempt} failed:`, err)
         if (attempt >= maxRetries) {
           const errMsg = err.message || 'TypeError: Failed to fetch'
           setStatus({ 
-            text: `❌ Connection Error (${errMsg}). If you are on a corporate network/VPN (like Zscaler) or have strict ad-blockers, they may block Hugging Face API streaming. Please try refreshing or checking your network connection.`, 
+            text: `❌ Network Error (${errMsg}). Notice: Even when connected to a personal hotspot, enterprise security services installed on work laptops (like Zscaler, Netskope, or AnyConnect background Windows drivers) intercept all system traffic and block third-party AI streaming. Please test on a personal smartphone/device to verify!`, 
             type: 'error' 
           })
         }

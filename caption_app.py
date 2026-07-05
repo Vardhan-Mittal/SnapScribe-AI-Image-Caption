@@ -627,31 +627,7 @@ def create_app():
                     "Use guided mode for custom context."
                 )
 
-        # ── Sample Images ──
-        gr.Markdown("---")
-        gr.Markdown("### 🖼️ Try with Sample Images", elem_classes="section-title")
-
-        gr.Examples(
-            examples=[
-                [
-                    "https://images.unsplash.com/photo-1518791841217-8f162f1e1131?w=400",
-                    "",
-                    "Both",
-                ],
-                [
-                    "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400",
-                    "",
-                    "Both",
-                ],
-                [
-                    "https://images.unsplash.com/photo-1474511320723-9a56873571b7?w=400",
-                    "A scenic view of",
-                    "Detailed",
-                ],
-            ],
-            inputs=[img_input, prompt_input, style_radio],
-            label="",
-        )
+        # ── Sample Images section removed to prevent external URL fetch timeouts ──
 
         # ── Footer ──
         gr.Markdown(
@@ -666,6 +642,7 @@ def create_app():
             fn=on_generate,
             inputs=[img_input, prompt_input, style_radio],
             outputs=[concise_output, detailed_output, status_output],
+            api_name="predict"
         )
 
         clear_btn.click(
